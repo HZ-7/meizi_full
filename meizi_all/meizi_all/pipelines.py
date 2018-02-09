@@ -25,4 +25,5 @@ class MeiziAllPipeline(ImagesPipeline):
         image_path = [x['path'] for ok, x in results if ok]
 #         重命名图片
         os.rename(IMAGES_STORE + image_path[0], IMAGES_STORE +item['type']+'/'+ item['image_title']+ "/" + item['image_alt'] +"-"+ str(self.offset)+".jpg")
+#         解决图片alt一致问题，给每个图片加一个序号
         self.offset += 1
