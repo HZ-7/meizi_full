@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 主要处理文件
 import scrapy,re,time
 
 from meizi_all.items import MeiziAllItem
@@ -8,13 +9,13 @@ class MeiziSpider(scrapy.Spider):
     name = 'meizi'
     allowed_domains = ['www.meizitu.com']
     start_urls = ['http://www.meizitu.com/']
-
+#   处理主网页，获取各个类型链接
     def parse(self, response):
         type_list = response.xpath('//*[@id="subcontent clearfix"]/div[2]/span/a')
         for type in type_list:
             type_page = type.xpath('./@href').extract()[0]
             yield scrapy.Request(url=type_page,callback= self.parse_type)
-
+#   处理分类主页，获取各个图片页面的链接和标题
     def parse_type(self,response):
         node_list = response.xpath('//*[@id="maincontent"]/div[1]/ul/li')
         type_list = response.xpath('//*[@id="maincontent"]/div[1]/div/h3/text()[2]').extract()[0]
@@ -24,11 +25,11 @@ class MeiziSpider(scrapy.Spider):
             page_url = node.xpath('./div/div/a/@href').extract()[0]
             image_title = node.xpath('./div/h3/a//text()').extract()[0]
             yield  scrapy.Request(url=page_url,callback=lambda response,type=type_text,img_tit = image_title:self.parse_page(response,type,img_tit))
-
+#       利用下一页按钮判断循环条件
         if '下一页' in response.xpath('//*[@id="wp_page_numbers"]/ul/li/a//text()').extract():
             next_url = "http://www.meizitu.com/a/"+ next_page[-2].extract()
             yield scrapy.Request(url=next_url, callback=self.parse_type)
-
+#   处理图片所在页，存储图片链接、标题，并将链接提交给管道文件进行下载
     def parse_page(self,response,type,img_tit):
         type_text = type
         image_title = img_tit
