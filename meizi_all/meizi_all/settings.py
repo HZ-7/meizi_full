@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# 项目配置文件
 # Scrapy settings for meizi_all project
 #
 # For simplicity, this file contains only settings considered important or
